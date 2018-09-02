@@ -19,6 +19,8 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate {
         super.viewDidLoad()
         // Do any additional setup after loading the view, typically from a nib.
         
+        self.view.backgroundColor = .black
+        
         // Gesture Setup
         let leftSwipe = UISwipeGestureRecognizer(target: self, action: #selector(handleSwipes(_:)))
         let rightSwipe = UISwipeGestureRecognizer(target: self, action: #selector(handleSwipes(_:)))
@@ -36,11 +38,13 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate {
         view.addGestureRecognizer(downSwipe)
         
         // Set Current Direction
-        self.currentDirection = .right
+        self.currentDirection = .up
         
         let head = UIView(frame: CGRect(x: self.view.frame.width/2, y: self.view.frame.height/2, width: 10, height: 10))
         head.center = CGPoint(x: self.view.frame.width/2, y: self.view.frame.height/2)
         head.backgroundColor = .green
+        head.layer.cornerRadius = 5;
+        head.layer.masksToBounds = true;
         self.view.addSubview(head)
         
         self.snake = [head]
@@ -50,42 +54,33 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate {
         
         self.candy = UIView(frame: CGRect(x: self.view.frame.width/2, y: self.view.frame.height/2, width: 10, height: 10))
         self.candy.backgroundColor = .red
+        self.candy.layer.cornerRadius = 5;
+        self.candy.layer.masksToBounds = true;
         self.view.addSubview(candy)
-        self.addCandy()
+        self.moveCandy()
     }
 
-    override func didReceiveMemoryWarning() {
-        super.didReceiveMemoryWarning()
-        // Dispose of any resources that can be recreated.
-    }
-    
-    
     // Handle Swipe
     @objc func handleSwipes(_ sender:UISwipeGestureRecognizer) {
-        
         if (sender.direction == .left) {
-            print("Swipe Left")
             if (currentDirection != .right){
                 currentDirection = .left
             }
         }
         
         if (sender.direction == .right) {
-            print("Swipe Right")
             if (currentDirection != .left){
                 currentDirection = .right
             }
         }
         
         if (sender.direction == .up) {
-             print("Swipe Up")
              if (currentDirection != .down){
             currentDirection = .up
             }
         }
         
         if (sender.direction == .down) {
-             print("Swipe Down")
              if (currentDirection != .up){
             currentDirection = .down
             }
@@ -115,7 +110,7 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate {
             tryToEat(view)
             // Check Edges
             if (xPos-10 < 0) {
-                self.timer.invalidate()
+                self.endGame()
             } else {
                 view.center = CGPoint(x: xPos-10, y: yPos)
             }
@@ -125,7 +120,7 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate {
             tryToEat(view)
             // Check Edges
             if (xPos+10 > self.view.frame.width) {
-                self.timer.invalidate()
+                self.endGame()
             } else {
                 view.center = CGPoint(x: xPos+10, y: yPos)
             }
@@ -135,7 +130,7 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate {
             tryToEat(view)
             // Check Edges
             if (yPos-10 < 0) {
-                self.timer.invalidate()
+                self.endGame()
             } else {
                view.center = CGPoint(x: xPos, y: yPos-10)
             }
@@ -145,11 +140,10 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate {
             tryToEat(view)
             // Check Edges
             if (yPos+10 > self.view.frame.height) {
-                self.timer.invalidate()
+                self.endGame()
             } else {
                 view.center = CGPoint(x: xPos, y: yPos+10)
             }
-        
             break
         case .none:
             break
@@ -160,20 +154,32 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate {
     
     func tryToEat(_ view:UIView) {
         if view.center == self.candy.center {
-            addCandy()
+            self.moveCandy()
             let link = UIView(frame: CGRect(x: 0, y: 0, width: 10, height: 10))
-            link.backgroundColor = .black
+            link.backgroundColor = .green
             link.center = CGPoint(x: (self.snake.last?.center.x)!
                 , y: (self.snake.last?.center.y)!)
+            link.layer.cornerRadius = 5;
+            link.layer.masksToBounds = true;
             self.view.addSubview(link)
-            
             self.snake.append(link)
-            print("\(self.snake.count)")
-            
         }
+        
+        var cnt = 0
+        for i in self.snake {
+            if i.center == self.snake.first?.center {
+                cnt += 1
+                if (cnt > 2 && self.snake.count > 3) {
+                    self.endGame()
+                    //self.snake.removeLast(self.snake.count - self.snake.index(of: i)!)
+                    break
+                }
+            }
+        }
+      
     }
     
-    func addCandy() {
+    func moveCandy() {
         self.candy.center = getRandomPoint()
     }
     
@@ -182,16 +188,31 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate {
         var randomNumY = CGFloat(arc4random_uniform(10) * 10)
         let coinFlipX = arc4random_uniform(2)
         let coinFlipY = arc4random_uniform(2)
-        
         if (coinFlipX == 0) {
             randomNumX = -randomNumX
         }
-        
         if (coinFlipY == 0) {
             randomNumY = -randomNumY
         }
-        print("\(randomNumX) , \(randomNumY)")
         return CGPoint(x: self.view.frame.width/2 + randomNumX, y: self.view.frame.height/2 + randomNumY)
+    }
+    
+    func startGame() {
+        
+    }
+    
+    func endGame() {
+        self.timer.invalidate()
+        let highScore = UserDefaults.standard.integer(forKey: "score")
+        if (highScore < self.snake.count) {
+            UserDefaults.standard.set(self.snake.count, forKey: "score")
+        }
+        let alert = UIAlertController(title: "Score: \(self.snake.count)", message: "Nice Job! High Score: \(UserDefaults.standard.integer(forKey: "score"))", preferredStyle: UIAlertControllerStyle.alert)
+        alert.addAction(UIAlertAction(title: "Try Again!", style: .default, handler: { (action) in
+            self.startGame()
+        }))
+        
+        self.present(alert, animated: true, completion: nil)
     }
 
 }

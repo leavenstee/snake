@@ -10,11 +10,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "snake/ViewController.swift"
-            timestampString = "557549082.931213"
+            timestampString = "557591531.338583"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "172"
-            endingLineNumber = "172"
+            startingLineNumber = "171"
+            endingLineNumber = "171"
             landmarkName = "tryToEat(_:)"
             landmarkType = "7">
          </BreakpointContent>
