@@ -40,17 +40,7 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate {
         // Set Current Direction
         self.currentDirection = .up
         
-        let head = UIView(frame: CGRect(x: self.view.frame.width/2, y: self.view.frame.height/2, width: 10, height: 10))
-        head.center = CGPoint(x: self.view.frame.width/2, y: self.view.frame.height/2)
-        head.backgroundColor = .green
-        head.layer.cornerRadius = 5;
-        head.layer.masksToBounds = true;
-        self.view.addSubview(head)
-        
-        self.snake = [head]
-        
-        // Timer
-        self.timer = Timer.scheduledTimer(timeInterval: 0.2, target: self, selector: #selector(moveSnake), userInfo: nil, repeats: true)
+        self.startGame()
         
         self.candy = UIView(frame: CGRect(x: self.view.frame.width/2, y: self.view.frame.height/2, width: 10, height: 10))
         self.candy.backgroundColor = .red
@@ -106,43 +96,39 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate {
         let yPos = view.center.y
         switch self.currentDirection {
         case .left:
-            // Check If Candy
-            tryToEat(view)
             // Check Edges
             if (xPos-10 < 0) {
                 self.endGame()
             } else {
                 view.center = CGPoint(x: xPos-10, y: yPos)
+                tryToEat(view)
             }
             break
         case .right:
-            // Check If Candy
-            tryToEat(view)
             // Check Edges
             if (xPos+10 > self.view.frame.width) {
                 self.endGame()
             } else {
                 view.center = CGPoint(x: xPos+10, y: yPos)
+                tryToEat(view)
             }
             break
         case .up:
-            // try to eat
-            tryToEat(view)
             // Check Edges
             if (yPos-10 < 0) {
                 self.endGame()
             } else {
                view.center = CGPoint(x: xPos, y: yPos-10)
+                tryToEat(view)
             }
             break
         case .down:
-            // Try to eat
-            tryToEat(view)
             // Check Edges
             if (yPos+10 > self.view.frame.height) {
                 self.endGame()
             } else {
                 view.center = CGPoint(x: xPos, y: yPos+10)
+                tryToEat(view)
             }
             break
         case .none:
@@ -198,6 +184,23 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate {
     }
     
     func startGame() {
+        if (snake != nil){
+            for i in snake {
+                i.removeFromSuperview()
+            }
+        }
+        let head = UIView(frame: CGRect(x: self.view.frame.width/2, y: self.view.frame.height/2, width: 10, height: 10))
+        head.center = CGPoint(x: self.view.frame.width/2, y: self.view.frame.height/2)
+        head.backgroundColor = .green
+        head.layer.cornerRadius = 5;
+        head.layer.masksToBounds = true;
+        self.view.addSubview(head)
+        
+        self.snake = [head]
+        
+        // Timer
+        self.timer = Timer.scheduledTimer(timeInterval: 0.2, target: self, selector: #selector(moveSnake), userInfo: nil, repeats: true)
+        
         
     }
     
