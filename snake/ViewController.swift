@@ -115,7 +115,7 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate {
             tryToEat(view)
             // Check Edges
             if (xPos-10 < 0) {
-                view.center = CGPoint(x: self.view.frame.width, y: yPos)
+                self.timer.invalidate()
             } else {
                 view.center = CGPoint(x: xPos-10, y: yPos)
             }
@@ -125,7 +125,7 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate {
             tryToEat(view)
             // Check Edges
             if (xPos+10 > self.view.frame.width) {
-                view.center = CGPoint(x: 10, y: yPos)
+                self.timer.invalidate()
             } else {
                 view.center = CGPoint(x: xPos+10, y: yPos)
             }
@@ -135,7 +135,7 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate {
             tryToEat(view)
             // Check Edges
             if (yPos-10 < 0) {
-                view.center = CGPoint(x: xPos, y: self.view.frame.height-10)
+                self.timer.invalidate()
             } else {
                view.center = CGPoint(x: xPos, y: yPos-10)
             }
@@ -145,7 +145,7 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate {
             tryToEat(view)
             // Check Edges
             if (yPos+10 > self.view.frame.height) {
-                view.center = CGPoint(x: xPos, y: 10)
+                self.timer.invalidate()
             } else {
                 view.center = CGPoint(x: xPos, y: yPos+10)
             }
